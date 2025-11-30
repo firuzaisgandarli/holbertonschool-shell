@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 # This script writes its PID to /var/run/myscript.pid and handles signals
 
-# PID faylını yarat
-echo $$ > /var/run/myscript.pid
+# PID faylını yarat (root icazəsi yoxdursa /tmp istifadə et)
+echo $$ > /var/run/myscript.pid 2>/dev/null || echo $$ > /tmp/myscript.pid
 
-# SIGTERM siqnalı üçün trap
-trap 'echo "I hate the kill command"; rm -f /var/run/myscript.pid; exit' SIGTERM
+trap 'echo "I hate the kill command"; rm -f /var/run/myscript.pid /tmp/myscript.pid; exit' SIGTERM
+trap 'echo "Y U no love me?!"; rm -f /var/run/myscript.pid /tmp/myscript.pid; exit' SIGINT
+trap 'rm -f /var/run/myscript.pid /tmp/myscript.pid; exit' SIGQUIT
 
-# SIGINT siqnalı üçün trap (Ctrl+C)
-trap 'echo "Y U no love me?!"; rm -f /var/run/myscript.pid; exit' SIGINT
-
-# SIGQUIT siqnalı üçün trap
-trap 'rm -f /var/run/myscript.pid; exit' SIGQUIT
-
-# Sonsuz loop
 while true
 do
     echo "To infinity and beyond"
